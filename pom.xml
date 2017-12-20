@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.dituhui</groupId>
+    <artifactId>haier690</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>haier690-api</module>
+        <module>haier690-provider</module>
+        <module>haier690-consumer</module>
+    </modules>
+
+    <!--在这里设置打包类型为pom，作用是为了实现多模块项目-->
+    <packaging>pom</packaging>
+
+    <!-- 第一步：添加Springboot的parent -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.8.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!-- 设置我们项目的一些版本属性 -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <commons-lang.version>2.6</commons-lang.version>
+        <mybatis.version>1.3.1</mybatis.version>
+        <mysql-connector-java.version>5.1.44</mysql-connector-java.version>
+        <fastjson.version>1.2.38</fastjson.version>
+        <druid.version>1.1.3</druid.version>
+        <dubbo.version>2.5.7</dubbo.version>
+        <zkclient.version>0.10</zkclient.version>
+        <lombok.version>1.16.18</lombok.version>
+        <httpclient.version>4.5.3</httpclient.version>
+        <spring-boot.version>1.5.8.RELEASE</spring-boot.version>
+        <spring-boot-starter-redis.version>1.4.7.RELEASE</spring-boot-starter-redis.version>
+        <pagehelper-spring-boot-starter.version>1.2.3</pagehelper-spring-boot-starter.version>
+        <com.alibaba.druid.version>1.1.5</com.alibaba.druid.version>
+    </properties>
+
+    <!-- 声明一些项目依赖管理，方便我们的依赖版本管理 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Springboot依赖 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- Springboot-web依赖 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- Springboot-mybatis依赖 -->
+            <dependency>
+                <groupId>org.mybatis.spring.boot</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+
+            <!-- 添加mysql支持 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql-connector-java.version}</version>
+            </dependency>
+
+            <!-- 添加redis支持 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-redis</artifactId>
+                <version>${spring-boot-starter-redis.version}</version>
+            </dependency>
+
+            <!-- 数据库连接池druid -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>${druid.version}</version>
+            </dependency>
+
+            <!-- 使用lombok实现JavaBean的get、set、toString、hashCode、equals等方法的自动生成  -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Dubbo依赖 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
+            </dependency>
+
+            <!-- zookeeper的客户端依赖 -->
+            <dependency>
+                <groupId>com.101tec</groupId>
+                <artifactId>zkclient</artifactId>
+                <version>${zkclient.version}</version>
+            </dependency>
+
+            <!-- fastJson支持 -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!-- httpclient支持 -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+
+            <!-- commons-lang支持 -->
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons-lang.version}</version>
+            </dependency>
+
+            <!-- 分页插件 -->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper-spring-boot-starter</artifactId>
+                <version>${pagehelper-spring-boot-starter.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+</project>
