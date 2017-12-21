@@ -104,17 +104,36 @@ public class HangingTableServiceImpl implements HangingTableService {
                             JSONArray jsonarr = jo.getJSONArray("infos");
                             for (int j = 0; j < jsonarr.size(); j++) {
                                 JSONObject jon = jsonarr.getJSONObject(j);
+                                String fielval = "";
+                                if ("区块ID".equals(jon.getString("fieldName"))) {
+                                    //获取区块id
+                                    fielval = jon.getString("fieldValue");
+                                }
                                 if ("属性状态".equals(jon.getString("fieldName"))) {
-                                    System.out.println(jon.getString("fieldValue"));
-                                    System.out.println(jo.getString("id"));
                                     String fiel = jon.getString("fieldValue");
                                     String id = jo.getString("id");
                                     if ("1".equals(fiel)) {
-//                                        HttpClient internalapiclient = HttpClientUtils.acceptsUntrustedCertsHttpClient();
-//                                        //发送get请求
-//                                        HttpPost internalapirequest = new HttpPost(haierUpdatetRegionblockbasicUrl);
-//                                        HttpResponse internalapiresponse = internalapiclient.execute(internalapirequest);
+                                        String status = "100000001";    //确认中
+                                        //如果状态为1，则返回
+                                        HttpClient internalapiclient = HttpClientUtils.acceptsUntrustedCertsHttpClient();
+                                        String haierurl = haierUpdatetRegionblockbasicUrl+"?";
+                                        //发送post请求
+                                        HttpPost internalapirequest = new HttpPost(haierurl);
+                                        HttpResponse internalapiresponse = internalapiclient.execute(internalapirequest);
+                                        String internalapiResult = EntityUtils.toString(internalapiresponse.getEntity());
+                                        JSONObject internalapiinfos = JSONObject.parseObject(internalapiResult);
+                                        String code = internalapiinfos.getString("flag");
                                     } else if ("2".equals(fiel)) {
+                                        String status = "100000000";    //审核通过
+                                        //如果状态为2，则返回并删除
+                                        HttpClient internalapiclient = HttpClientUtils.acceptsUntrustedCertsHttpClient();
+                                        String haierurl = haierUpdatetRegionblockbasicUrl+"?";
+                                        //发送post请求
+                                        HttpPost internalapirequest = new HttpPost(haierurl);
+                                        HttpResponse internalapiresponse = internalapiclient.execute(internalapirequest);
+                                        String internalapiResult = EntityUtils.toString(internalapiresponse.getEntity());
+                                        JSONObject internalapiinfos = JSONObject.parseObject(internalapiResult);
+                                        String code = internalapiinfos.getString("flag");
                                         Map<String, Object> mapdel = new HashMap<String, Object>();
                                         String fieldName = String.valueOf(jon.getString("fieldName"));
                                         String fieldValue = String.valueOf(jon.getString("fieldValue"));
