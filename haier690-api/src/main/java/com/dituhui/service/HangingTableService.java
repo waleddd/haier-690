@@ -29,6 +29,13 @@ public interface HangingTableService {
      */
     void hangingtableDel(String url,Map<String,Object> paramMap,String layercode);
 
+    /**
+     * 外挂表添加方法
+     * @param url
+     * @param paramMap
+     */
+    void hangingtableAdd(String url,String paramMap,String layercode);
+
 
 
 
