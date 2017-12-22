@@ -6,7 +6,11 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Xugn on 2017/12/21.
@@ -55,5 +59,22 @@ public class HttpUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static String pushAttendanceInfo(String value,String url) {
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost post = new HttpPost(url);
+        StringEntity postingString = null;// json传递
+        try {
+            postingString = new StringEntity(value);
+            post.setEntity(postingString);
+            post.setHeader("Content-type", "application/json");
+            HttpResponse response = httpClient.execute(post);
+            String content = EntityUtils.toString(response.getEntity());
+            return  content;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  null;
     }
 }
