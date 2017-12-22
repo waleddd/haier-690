@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.dituhui.config.LayerCodeList;
 import com.dituhui.service.HangingTableService;
 import com.dituhui.utils.HttpClientUtils;
+import com.dituhui.utils.HttpUtils;
 import com.dituhui.utils.SaasSignUtils;
 import com.dituhui.utils.WrapRequest;
 import org.apache.http.HttpResponse;
@@ -33,7 +34,7 @@ public class HangingTableServiceImpl implements HangingTableService {
     //private static final String secretKey = "8aafdd8c5d8eaf58015d97c032780027";
     private static final String secretKey = "df666850016d4fd69e02527ac8ff3709";
     private static final String ak = "af99ac257f4449ce86f2a3f402abcc53";
-    private static  String haierUpdatetRegionblockbasicUrl = "http://10.135.12.210:4000/internalapi/hsi/hSIToSuperMapController/updatetRegionblockbasic";
+    private static  String haierUpdatetRegionblockbasicUrl = "http://hsi.haier.net:8899/internalapi/hsi/hSIToSuperMapController/updatetRegionblockbasic";
 
     Timer timer = new Timer();
 
@@ -42,7 +43,7 @@ public class HangingTableServiceImpl implements HangingTableService {
     @Override
     public void timerSearch() {
         //添加
-        String layercode = "047_002";
+        String layercode = "041_001";
 //        String  paramMap = "[{\"fieldName\":\"省级名称\",\"fieldValue\":\"广西省\"},{\"fieldName\":\"市级名称\",\"fieldValue\":\"南宁市\"},{\"fieldName\":\"区块ID\",\"fieldValue\":\"20110329NN0377\"},{\"fieldName\":\"名称\",\"fieldValue\":\"蒙山县黄村镇\"},{\"fieldName\":\"工贸名称\",\"fieldValue\":\"南宁工贸\"},{\"fieldName\":\"工贸编号\",\"fieldValue\":\"GFSH\"},{\"fieldName\":\"区块编码\",\"fieldValue\":\"NN03262\"}]";
 //        hangingtableAdd(urlPrefix,paramMap,layercode);
         //删除
@@ -52,11 +53,12 @@ public class HangingTableServiceImpl implements HangingTableService {
 //        hangingtableDel(urlPrefix,maps,layercode);
         //查询
         Map<String,Object> map = new HashMap<String,Object>();
-        map.put("fieldValue",0);
+        map.put("fieldValue",2);
         map.put("fieldName","属性状态");
         hangingtableSearch(urlPrefix,map,layercode);
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
+                //for循环所有的图层code
 //                for(Object s : LayerCodeList.list){
 //                    String layercode = String.valueOf(s);
 //                    Map<String,Object> map = new HashMap<String,Object>();
@@ -102,9 +104,10 @@ public class HangingTableServiceImpl implements HangingTableService {
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JSONObject jo = jsonArray.getJSONObject(i);
                             JSONArray jsonarr = jo.getJSONArray("infos");
+                            //for循环出所有infos的 数据
+                            String fielval = "";
                             for (int j = 0; j < jsonarr.size(); j++) {
                                 JSONObject jon = jsonarr.getJSONObject(j);
-                                String fielval = "";
                                 if ("区块ID".equals(jon.getString("fieldName"))) {
                                     //获取区块id
                                     fielval = jon.getString("fieldValue");
@@ -115,31 +118,27 @@ public class HangingTableServiceImpl implements HangingTableService {
                                     if ("1".equals(fiel)) {
                                         String status = "100000001";    //确认中
                                         //如果状态为1，则返回
-                                        HttpClient internalapiclient = HttpClientUtils.acceptsUntrustedCertsHttpClient();
-                                        String haierurl = haierUpdatetRegionblockbasicUrl+"?";
-                                        //发送post请求
-                                        HttpPost internalapirequest = new HttpPost(haierurl);
-                                        HttpResponse internalapiresponse = internalapiclient.execute(internalapirequest);
-                                        String internalapiResult = EntityUtils.toString(internalapiresponse.getEntity());
-                                        JSONObject internalapiinfos = JSONObject.parseObject(internalapiResult);
-                                        String code = internalapiinfos.getString("flag");
+                                        String value = "{\n" +
+                                                "    \"hsicrmRegionblockid\": \""+fielval+"\",\n" +
+                                                "    \"status\": \""+status+"\",\n" +
+                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
+                                                "}";
+                                        String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
                                     } else if ("2".equals(fiel)) {
                                         String status = "100000000";    //审核通过
                                         //如果状态为2，则返回并删除
-                                        HttpClient internalapiclient = HttpClientUtils.acceptsUntrustedCertsHttpClient();
-                                        String haierurl = haierUpdatetRegionblockbasicUrl+"?";
-                                        //发送post请求
-                                        HttpPost internalapirequest = new HttpPost(haierurl);
-                                        HttpResponse internalapiresponse = internalapiclient.execute(internalapirequest);
-                                        String internalapiResult = EntityUtils.toString(internalapiresponse.getEntity());
-                                        JSONObject internalapiinfos = JSONObject.parseObject(internalapiResult);
-                                        String code = internalapiinfos.getString("flag");
+                                        String value = "{\n" +
+                                                "    \"hsicrmRegionblockid\": \""+fielval+"\",\n" +
+                                                "    \"status\": \""+status+"\",\n" +
+                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
+                                                "}";
+                                        String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
                                         Map<String, Object> mapdel = new HashMap<String, Object>();
                                         String fieldName = String.valueOf(jon.getString("fieldName"));
                                         String fieldValue = String.valueOf(jon.getString("fieldValue"));
                                         mapdel.put("fieldName", fieldName);
                                         mapdel.put("fieldValue", fieldValue);
-                                        hangingtableDel(urlPrefix, mapdel, layercode);
+//                                        hangingtableDel(urlPrefix, mapdel, layercode);
                                         return id;
                                     }
                                     break;
