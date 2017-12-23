@@ -43,7 +43,7 @@ public class HangingTableServiceImpl implements HangingTableService {
     @Override
     public void timerSearch() {
         //添加
-        String layercode = "041_001";
+//        String layercode = "041_001";
 //        String  paramMap = "[{\"fieldName\":\"省级名称\",\"fieldValue\":\"广西省\"},{\"fieldName\":\"市级名称\",\"fieldValue\":\"南宁市\"},{\"fieldName\":\"区块ID\",\"fieldValue\":\"20110329NN0377\"},{\"fieldName\":\"名称\",\"fieldValue\":\"蒙山县黄村镇\"},{\"fieldName\":\"工贸名称\",\"fieldValue\":\"南宁工贸\"},{\"fieldName\":\"工贸编号\",\"fieldValue\":\"GFSH\"},{\"fieldName\":\"区块编码\",\"fieldValue\":\"NN03262\"}]";
 //        hangingtableAdd(urlPrefix,paramMap,layercode);
         //删除
@@ -52,24 +52,24 @@ public class HangingTableServiceImpl implements HangingTableService {
 //        maps.put("fieldName","属性状态");
 //        hangingtableDel(urlPrefix,maps,layercode);
         //查询
-        Map<String,Object> map = new HashMap<String,Object>();
-        map.put("fieldValue",2);
-        map.put("fieldName","属性状态");
-        hangingtableSearch(urlPrefix,map,layercode);
+//        Map<String,Object> map = new HashMap<String,Object>();
+//        map.put("fieldValue",1);
+//        map.put("fieldName","属性状态");
+//        hangingtableSearch(urlPrefix,map,layercode);
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
                 //for循环所有的图层code
-//                for(Object s : LayerCodeList.list){
-//                    String layercode = String.valueOf(s);
-//                    Map<String,Object> map = new HashMap<String,Object>();
-//                    map.put("fieldValue",1);
-//                    map.put("fieldName","属性状态");
-//                    hangingtableSearch(urlPrefix,map,layercode);
-//                    Map<String,Object> maps = new HashMap<String,Object>();
-//                    maps.put("fieldValue",2);
-//                    maps.put("fieldName","属性状态");
-//                    hangingtableDel(urlPrefix,maps,"layercode");
-//                }
+                for(Object s : LayerCodeList.list){
+                    String layercode = String.valueOf(s);
+                    Map<String,Object> map = new HashMap<String,Object>();
+                    map.put("fieldValue",1);
+                    map.put("fieldName","属性状态");
+                    hangingtableSearch(urlPrefix,map,layercode);
+                    Map<String,Object> maps = new HashMap<String,Object>();
+                    maps.put("fieldValue",2);
+                    maps.put("fieldName","属性状态");
+                    hangingtableSearch(urlPrefix,maps,layercode);
+                }
             }
         }, 1000 , 5000);
     }
@@ -92,7 +92,7 @@ public class HangingTableServiceImpl implements HangingTableService {
             //发送get请求
             HttpGet request = new HttpGet(requestUrl);
             HttpResponse response = client.execute(request);
-
+            System.out.println("正在查询中。。。。"+layercode);
             /**请求发送成功，并得到响应**/
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 /**读取服务器返回过来的json字符串数据**/
@@ -110,7 +110,8 @@ public class HangingTableServiceImpl implements HangingTableService {
                                 JSONObject jon = jsonarr.getJSONObject(j);
                                 if ("区块ID".equals(jon.getString("fieldName"))) {
                                     //获取区块id
-                                    fielval = jon.getString("fieldValue");
+                                    fielval = "074C9B2C-14E6-E711-80D8-005056A354DD";
+//                                    fielval = jon.getString("fieldValue");
                                 }
                                 if ("属性状态".equals(jon.getString("fieldName"))) {
                                     String fiel = jon.getString("fieldValue");
@@ -124,6 +125,11 @@ public class HangingTableServiceImpl implements HangingTableService {
                                                 "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
                                                 "}";
                                         String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
+                                        System.err.println("状态一返回数据成功，未判断");
+                                        JSONObject jsoncode = JSONObject.parseObject(code);
+                                        if("success".equals(jsoncode.getString("flag"))){
+                                            System.err.println("状态一返回数据成功");
+                                        }
                                     } else if ("2".equals(fiel)) {
                                         String status = "100000000";    //审核通过
                                         //如果状态为2，则返回并删除
@@ -133,13 +139,19 @@ public class HangingTableServiceImpl implements HangingTableService {
                                                 "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
                                                 "}";
                                         String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
-                                        Map<String, Object> mapdel = new HashMap<String, Object>();
-                                        String fieldName = String.valueOf(jon.getString("fieldName"));
-                                        String fieldValue = String.valueOf(jon.getString("fieldValue"));
-                                        mapdel.put("fieldName", fieldName);
-                                        mapdel.put("fieldValue", fieldValue);
-//                                        hangingtableDel(urlPrefix, mapdel, layercode);
-                                        return id;
+                                        JSONObject jsoncode = JSONObject.parseObject(code);
+                                        if("success".equals(jsoncode.getString("flag"))){
+                                            System.err.println("状态二返回数据成功");
+                                            Map<String, Object> mapdel = new HashMap<String, Object>();
+                                            String fieldName = String.valueOf(jon.getString("fieldName"));
+                                            String fieldValue = String.valueOf(jon.getString("fieldValue"));
+                                            mapdel.put("fieldName", fieldName);
+                                            mapdel.put("fieldValue", fieldValue);
+                                            hangingtableDel(urlPrefix, mapdel, layercode);
+                                            return id;
+                                        }else{
+                                            return jsoncode.getString("flag");
+                                        }
                                     }
                                     break;
                                 }
@@ -185,6 +197,7 @@ public class HangingTableServiceImpl implements HangingTableService {
                 String strResult = EntityUtils.toString(response.getEntity());
                 JSONObject jsoninfos = JSONObject.parseObject(strResult);
                 JSONArray jsonArray =jsoninfos.getJSONArray("result");
+                System.err.println("状态二删除成功。图层："+layercode+"."+jsonparam);
             }
         } catch (Exception e) {
             e.printStackTrace();
