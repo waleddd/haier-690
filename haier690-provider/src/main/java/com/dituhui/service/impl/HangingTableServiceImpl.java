@@ -43,7 +43,8 @@ public class HangingTableServiceImpl implements HangingTableService {
     @Override
     public void timerSearch() {
         //添加
-//        String layercode = "041_001";
+//        String layercode = "03c_001";
+        String layercode = "041_001";
 //        String  paramMap = "[{\"fieldName\":\"省级名称\",\"fieldValue\":\"广西省\"},{\"fieldName\":\"市级名称\",\"fieldValue\":\"南宁市\"},{\"fieldName\":\"区块ID\",\"fieldValue\":\"20110329NN0377\"},{\"fieldName\":\"名称\",\"fieldValue\":\"蒙山县黄村镇\"},{\"fieldName\":\"工贸名称\",\"fieldValue\":\"南宁工贸\"},{\"fieldName\":\"工贸编号\",\"fieldValue\":\"GFSH\"},{\"fieldName\":\"区块编码\",\"fieldValue\":\"NN03262\"}]";
 //        hangingtableAdd(urlPrefix,paramMap,layercode);
         //删除
@@ -58,18 +59,7 @@ public class HangingTableServiceImpl implements HangingTableService {
 //        hangingtableSearch(urlPrefix,map,layercode);
         timer.scheduleAtFixedRate(new TimerTask() {
             public void run() {
-                //for循环所有的图层code
-                for(Object s : LayerCodeList.list){
-                    String layercode = String.valueOf(s);
-                    Map<String,Object> map = new HashMap<String,Object>();
-                    map.put("fieldValue",1);
-                    map.put("fieldName","属性状态");
-                    hangingtableSearch(urlPrefix,map,layercode);
-                    Map<String,Object> maps = new HashMap<String,Object>();
-                    maps.put("fieldValue",2);
-                    maps.put("fieldName","属性状态");
-                    hangingtableSearch(urlPrefix,maps,layercode);
-                }
+            hangingtableSearch(urlPrefix);
             }
         }, 1000 , 5000);
     }
@@ -77,22 +67,20 @@ public class HangingTableServiceImpl implements HangingTableService {
     /**
      * 查询
      * @param url
-     * @param paramMap
-     * @param layercode
      * @return
      */
     @Override
-    public String hangingtableSearch(String url,Map<String,Object> paramMap,String layercode) {
+    public String hangingtableSearch(String url) {
+        String paramMap = "[{\"fieldName\":\"属性状态\",\"fieldValue\":\"0\"}，{\"fieldName\":\"属性状态\",\"fieldValue\":\"1\"}，{\"fieldName\":\"属性状态\",\"fieldValue\":\"2\"}，{\"fieldName\":\"属性状态\",\"fieldValue\":\"3\"}]";
         String jsonparam = JSONObject.toJSONString(paramMap);
         try{
             jsonparam = java.net.URLEncoder.encode(jsonparam, "UTF-8");
-            String params = "custom_id="+jsonparam+"&ak="+ak+"&layercode="+layercode;
+            String params = "customs="+jsonparam+"&ak="+ak+"&data_type=Area&custom_composite_type=Or";
             String requestUrl = WrapRequest.wrapRequest("properties", "search", params, urlPrefix);
             HttpClient client = HttpClientUtils.acceptsUntrustedCertsHttpClient();
             //发送get请求
             HttpGet request = new HttpGet(requestUrl);
             HttpResponse response = client.execute(request);
-            System.out.println("正在查询中。。。。"+layercode);
             /**请求发送成功，并得到响应**/
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 /**读取服务器返回过来的json字符串数据**/
@@ -106,12 +94,18 @@ public class HangingTableServiceImpl implements HangingTableService {
                             JSONArray jsonarr = jo.getJSONArray("infos");
                             //for循环出所有infos的 数据
                             String fielval = "";
+                            String layercode = "";
                             for (int j = 0; j < jsonarr.size(); j++) {
                                 JSONObject jon = jsonarr.getJSONObject(j);
                                 if ("区块ID".equals(jon.getString("fieldName"))) {
                                     //获取区块id
                                     fielval = "074C9B2C-14E6-E711-80D8-005056A354DD";
 //                                    fielval = jon.getString("fieldValue");
+                                }
+                                if ("layercode".equals(jon.getString("fieldName"))) {
+                                    //获取区块id
+                                    layercode = "041_001";
+//                                    layercode = jon.getString("layercode");
                                 }
                                 if ("属性状态".equals(jon.getString("fieldName"))) {
                                     String fiel = jon.getString("fieldValue");
@@ -125,7 +119,6 @@ public class HangingTableServiceImpl implements HangingTableService {
                                                 "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
                                                 "}";
                                         String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
-                                        System.err.println("状态一返回数据成功，未判断");
                                         JSONObject jsoncode = JSONObject.parseObject(code);
                                         if("success".equals(jsoncode.getString("flag"))){
                                             System.err.println("状态一返回数据成功");
@@ -152,6 +145,29 @@ public class HangingTableServiceImpl implements HangingTableService {
                                         }else{
                                             return jsoncode.getString("flag");
                                         }
+                                    }else if("3".equals(fiel)){
+                                        String status = "100000003";    //审核驳回
+                                        //如果状态为3，则返回并修改
+                                        String value = "{\n" +
+                                                "    \"hsicrmRegionblockid\": \""+fielval+"\",\n" +
+                                                "    \"status\": \""+status+"\",\n" +
+                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
+                                                "}";
+                                        String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
+                                        JSONObject jsoncode = JSONObject.parseObject(code);
+                                        if("success".equals(jsoncode.getString("flag"))){
+                                            System.err.println("状态三返回数据成功");
+                                            Map<String, Object> mapdel = new HashMap<String, Object>();
+                                            String fieldName = String.valueOf(jon.getString("fieldName"));
+                                            String fieldValue = String.valueOf(jon.getString("fieldValue"));
+                                            mapdel.put("fieldName", fieldName);
+                                            mapdel.put("fieldValue", fieldValue);
+                                            String infos = "[{\\\"fieldName\\\":\\\"属性状态\\\",\\\"fieldValue\\\":\\\"3\\\"}]";
+//                                            hangingtableUpdate(urlPrefix, mapdel, layercode,infos);
+                                            return id;
+                                        }else{
+                                            return jsoncode.getString("flag");
+                                        }
                                     }
                                     break;
                                 }
@@ -165,6 +181,7 @@ public class HangingTableServiceImpl implements HangingTableService {
         }
         return null;
     }
+
 
     /**
      * 删除外 挂表
@@ -204,6 +221,8 @@ public class HangingTableServiceImpl implements HangingTableService {
         }
     }
 
+
+
     /**
      * 添加外 挂表
      * @param url
@@ -234,7 +253,12 @@ public class HangingTableServiceImpl implements HangingTableService {
                 /**读取服务器返回过来的json字符串数据**/
                 String strResult = EntityUtils.toString(response.getEntity());
                 JSONObject jsoninfos = JSONObject.parseObject(strResult);
-                JSONArray jsonArray =jsoninfos.getJSONArray("result");
+                if("S001".equals(jsoninfos.getString("code"))){
+                    JSONArray jsonArray =jsoninfos.getJSONArray("result");
+                    System.out.println("添加成功"+layercode);
+                }else{
+                    System.out.println("失败"+layercode);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

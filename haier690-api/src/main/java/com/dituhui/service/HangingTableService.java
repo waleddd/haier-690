@@ -20,10 +20,17 @@ public interface HangingTableService {
      * @param paramMap
      * @return
      */
-    String hangingtableSearch(String url,Map<String,Object> paramMap,String layercode);
+    String hangingtableSearch(String url);
 
     /**
-     * 外挂表删除方法
+     * 外挂表删除面方法
+     * @param url
+     * @param paramMap
+     */
+    //void hangingtableUpdate(String url,Map<String,Object> paramMap,String layercode,String infos);
+
+    /**
+     * 外挂表删除属性方法
      * @param url
      * @param paramMap
      */
