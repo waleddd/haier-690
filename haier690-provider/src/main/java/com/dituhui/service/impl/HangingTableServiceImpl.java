@@ -38,8 +38,6 @@ public class HangingTableServiceImpl implements HangingTableService {
 
     Timer timer = new Timer();
 
-
-
     @Override
     public void timerSearch() {
         //添加
@@ -116,7 +114,7 @@ public class HangingTableServiceImpl implements HangingTableService {
                                         String value = "{\n" +
                                                 "    \"hsicrmRegionblockid\": \""+fielval+"\",\n" +
                                                 "    \"status\": \""+status+"\",\n" +
-                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
+                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"\n" +
                                                 "}";
                                         String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
                                         JSONObject jsoncode = JSONObject.parseObject(code);
@@ -129,7 +127,7 @@ public class HangingTableServiceImpl implements HangingTableService {
                                         String value = "{\n" +
                                                 "    \"hsicrmRegionblockid\": \""+fielval+"\",\n" +
                                                 "    \"status\": \""+status+"\",\n" +
-                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"      \n" +
+                                                "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"\n" +
                                                 "}";
                                         String code = HttpUtils.pushAttendanceInfo(value,haierUpdatetRegionblockbasicUrl);
                                         JSONObject jsoncode = JSONObject.parseObject(code);
