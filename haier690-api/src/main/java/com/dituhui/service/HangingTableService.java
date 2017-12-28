@@ -17,7 +17,6 @@ public interface HangingTableService {
     /**
      * 外挂表查询方法
      * @param url
-     * @param paramMap
      * @return
      */
     String hangingtableSearch(String url);
@@ -25,9 +24,8 @@ public interface HangingTableService {
     /**
      * 外挂表删除面方法
      * @param url
-     * @param paramMap
      */
-    //void hangingtableUpdate(String url,Map<String,Object> paramMap,String layercode,String infos);
+    void hangingtableDelById(String url,Map<String,Object> paramMap,String id,String layercode);
 
     /**
      * 外挂表删除属性方法
