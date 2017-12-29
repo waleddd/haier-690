@@ -24,7 +24,7 @@ public class PoiServiceImpl implements PoiService{
         do{
             List<PoiEntity> result = poiMapper.searchPoiByLonlat(lon, lat, length);
             if(result.size()>0){
-                double distance = 5000;
+                double distance = 5000000;
                 for(int index = 0,size = result.size();index < size;index++){
                     PoiEntity poiEntity = result.get(index);
                     double smx = Double.valueOf(poiEntity.getSmx());
@@ -35,7 +35,7 @@ public class PoiServiceImpl implements PoiService{
                 }
             }
             length *=2;
-        }while(poiEntityResult==null||length>3500);
+        }while(poiEntityResult==null&&length<3500);
         return poiEntityResult;
     }
 }

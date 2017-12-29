@@ -25,7 +25,7 @@ public class PoiController {
     PoiEntity searchPoiByLonlat(String lon, String lat,String type){
         double lonDouble = Double.valueOf(lon);
         double latDouble = Double.valueOf(lat);
-        if(type.equals("ll")){
+        if(type != null && type.equals("ll")){
             Point point = SuperMapCoordinateConvertImpl.smLL2MC(new Point(lonDouble,latDouble));
             return poiService.searchPoiByLonlat(point.getLon(),point.getLat());
         }else{
