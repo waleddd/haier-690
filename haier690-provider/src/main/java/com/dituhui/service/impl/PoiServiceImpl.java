@@ -18,20 +18,18 @@ public class PoiServiceImpl implements PoiService{
     @Autowired
     PoiMapper poiMapper;
     @Override
-    public PoiEntity searchPoiByLonlat(String lon, String lat) {
+    public PoiEntity searchPoiByLonlat(double lon, double lat) {
         PoiEntity poiEntityResult = null;
         int length = 50;
-        double lonDouble = Double.valueOf(lon);
-        double latDouble = Double.valueOf(lat);
         do{
-            List<PoiEntity> result = poiMapper.searchPoiByLonlat(lon, lat, String.valueOf(length));
+            List<PoiEntity> result = poiMapper.searchPoiByLonlat(lon, lat, length);
             if(result.size()>0){
                 double distance = 5000;
                 for(int index = 0,size = result.size();index < size;index++){
                     PoiEntity poiEntity = result.get(index);
                     double smx = Double.valueOf(poiEntity.getSmx());
                     double smy = Double.valueOf(poiEntity.getSmy());
-                    if(Math.pow(lonDouble-smx,2)+Math.pow(latDouble-smy,2)<distance){
+                    if(Math.pow(lon-smx,2)+Math.pow(lat-smy,2)<distance){
                         poiEntityResult = poiEntity;
                     }
                 }

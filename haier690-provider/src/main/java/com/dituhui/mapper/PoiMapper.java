@@ -16,5 +16,5 @@ public interface PoiMapper {
 //            @Result(property = "poiId",  column = "poi_id"),
 //            @Result(property = "poiName",  column = "poi_name")
 //	})
-    public List<PoiEntity> searchPoiByLonlat(@Param("lon")String lon, @Param("lat")String lat, @Param("length")String length);
+    List<PoiEntity> searchPoiByLonlat(@Param("lon") double lon, @Param("lat") double lat, @Param("length") int length);
 }
