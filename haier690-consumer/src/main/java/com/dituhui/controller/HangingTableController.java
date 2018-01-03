@@ -18,9 +18,6 @@ public class HangingTableController {
 
     @RequestMapping(value = "/searchHangingTable", method = { RequestMethod.GET, RequestMethod.POST })
     public @ResponseBody String searchHangingTable(String ak,String layercode,String custom_id) {
-        try {
-        }catch (Exception e){
-        }
         return null;
     }
 }

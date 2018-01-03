@@ -31,7 +31,6 @@ public class PoiController {
         }else{
             return poiService.searchPoiByLonlat(lonDouble,latDouble);
         }
-
     }
 }
 

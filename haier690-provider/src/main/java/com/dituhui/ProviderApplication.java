@@ -1,5 +1,7 @@
 package com.dituhui;
 
+import com.dituhui.service.HangingTableService;
+import com.dituhui.service.impl.HangingTableServiceImpl;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -20,6 +22,8 @@ import org.apache.zookeeper.Watcher;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import java.io.IOException;
 
 @ConfigurationProperties(prefix="spring")
 @SpringBootApplication
@@ -48,12 +52,12 @@ public class ProviderApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ProviderApplication.class, args);
-//        HangingTableService hangingTableService = new HangingTableServiceImpl();
-//        hangingTableService.timerSearch();
-//        try {
-//            System.in.read();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        HangingTableService hangingTableService = new HangingTableServiceImpl();
+        hangingTableService.timerSearch();
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

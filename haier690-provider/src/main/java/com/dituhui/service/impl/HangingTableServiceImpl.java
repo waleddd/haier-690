@@ -27,15 +27,15 @@ import java.util.TimerTask;
 @Service(version = "1.0.0")
 public class HangingTableServiceImpl implements HangingTableService {
 
-//    private static String urlPrefix = "http://saasapi.dituhui.com/v1";
-    private static String urlPrefix = "http://114.55.43.0:16907/v1";
+    private static String urlPrefix = "http://saasapi.dituhui.com/v1";
+//    private static String urlPrefix = "http://114.55.43.0:16907/v1";
     private static final String defaultUrl = "{urlPrefix}/{interfaceName}/{methodName}"; // 默认Url
     // private static final String ak = "0142dd73d78b475cb3fb3ba952ebfe78";
     //private static final String secretKey = "8aafdd8c5d8eaf58015d97c032780027";
     private static final String secretKey = "df666850016d4fd69e02527ac8ff3709";
-//    private static final String ak = "af99ac257f4449ce86f2a3f402abcc53";
-    private static final String ak = "b82f5241ff6f4a32b78ef7e034bab693";
-    private static  String haierUpdatetRegionblockbasicUrl = "http://hsi.haier.net:8899/internalapi/hsi/hSIToSuperMapController/updatetRegionblockbasic";
+    private static final String ak = "af99ac257f4449ce86f2a3f402abcc53";
+//    private static final String ak = "b82f5241ff6f4a32b78ef7e034bab693";
+    private static  String haierUpdatetRegionblockbasicUrl = "http://hsitest.haier.net:8899/internalapi/hsi/hSIToSuperMapController/updatetRegionblockbasic";
 
     Timer timer = new Timer();
 
@@ -102,8 +102,8 @@ public class HangingTableServiceImpl implements HangingTableService {
                                     JSONObject jon = jsonarr.getJSONObject(j);
                                     if ("区块ID".equals(jon.getString("fieldName"))) {
                                         //获取区块id
-//                                    fielval = "074C9B2C-14E6-E711-80D8-005056A354DD";
-                                        fielval = jon.getString("fieldValue");
+                                    fielval = "152436A9-6B30-4192-B5AA-000182D4B91E";
+//                                  fielval = jon.getString("fieldValue");
                                     }
                                     if ("layercode".equals(jon.getString("fieldName"))) {
                                         //获取区块id
@@ -217,8 +217,12 @@ public class HangingTableServiceImpl implements HangingTableService {
                 /**读取服务器返回过来的json字符串数据**/
                 String strResult = EntityUtils.toString(response.getEntity());
                 JSONObject jsoninfos = JSONObject.parseObject(strResult);
-                JSONArray jsonArray =jsoninfos.getJSONArray("result");
-                System.err.println("状态三删除成功。图层："+layercode+"."+jsonparam);
+                if("S001".equals(jsoninfos.getString("code"))) {
+                    JSONArray jsonArray = jsoninfos.getJSONArray("result");
+                    System.err.println("状态三删除成功。图层：" + layercode + "." + jsonparam);
+                }else{
+                    System.err.println("删除待审核数据"+jsoninfos.getString("code"));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
