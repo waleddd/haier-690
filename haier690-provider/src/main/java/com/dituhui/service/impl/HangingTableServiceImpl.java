@@ -9,6 +9,8 @@ import com.dituhui.utils.HttpClientUtils;
 import com.dituhui.utils.HttpUtils;
 import com.dituhui.utils.SaasSignUtils;
 import com.dituhui.utils.WrapRequest;
+import com.supermap.convert.impl.SuperMapCoordinateConvertImpl;
+import com.supermap.entity.Point;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -91,27 +93,30 @@ public class HangingTableServiceImpl implements HangingTableService {
                     int totalPage =jsonObj.getInteger("totalPage");
                     if (jsonArray != null) {
                         for(int l = 0; l < totalPage; l++) {
+                            String id = "";
+                            String ids = "";
                             for (int i = 0; i < jsonArray.size(); i++) {
                                 JSONObject jo = jsonArray.getJSONObject(i);
                                 JSONArray jsonarr = jo.getJSONArray("infos");
                                 //for循环出所有infos的 数据
                                 String fielval = "";
                                 String layercode = "";
-                                String id = "";
                                 for (int j = 0; j < jsonarr.size(); j++) {
                                     JSONObject jon = jsonarr.getJSONObject(j);
                                     if ("区块ID".equals(jon.getString("fieldName"))) {
                                         //获取区块id
-                                    fielval = "152436A9-6B30-4192-B5AA-000182D4B91E";
-//                                  fielval = jon.getString("fieldValue");
+//                                    fielval = "152436A9-6B30-4192-B5AA-000182D4B91E";
+                                        fielval = jon.getString("fieldValue");
                                     }
                                     if ("layercode".equals(jon.getString("fieldName"))) {
                                         //获取区块id
 //                                    layercode = "041_001";
                                         layercode = jon.getString("fieldValue");
                                     }
-                                    if ("属性绑定ID".equals(jon.getString("fieldName"))) {
-                                        id = jon.getString("fieldValue");
+                                    if ("属性绑定ID".equals(jon.getString("fieldName")) && jon.containsKey("fieldValue")) {
+                                        id = "2222fe67031c4df9b1521ebb00d0cc02";
+//                                        id = jon.getString("fieldValue");
+                                        ids = searchId(id);
                                     }
                                     if ("属性状态".equals(jon.getString("fieldName"))) {
                                         String fiel = jon.getString("fieldValue");
@@ -122,7 +127,7 @@ public class HangingTableServiceImpl implements HangingTableService {
                                             String value = "{\n" +
                                                     "    \"hsicrmRegionblockid\": \"" + fielval + "\",\n" +
                                                     "    \"status\": \"" + status + "\",\n" +
-                                                    "    \"hsicrmBoundary\": \"(120.2,190.8),(120.4,181.3)\"\n" +
+                                                    "    \"hsicrmBoundary\": \"" + ids + "\"\n" +
                                                     "}";
                                             String code = HttpUtils.pushAttendanceInfo(value, haierUpdatetRegionblockbasicUrl);
                                             JSONObject jsoncode = JSONObject.parseObject(code);
@@ -146,7 +151,7 @@ public class HangingTableServiceImpl implements HangingTableService {
                                                 String fieldValue = String.valueOf(jon.getString("fieldValue"));
                                                 mapdel.put("fieldName", fieldName);
                                                 mapdel.put("fieldValue", fieldValue);
-                                                hangingtableDel(urlPrefix, mapdel, layercode);
+//                                                hangingtableDel(urlPrefix, mapdel, layercode);
                                                 return id;
                                             } else {
                                                 return jsoncode.getString("flag");
@@ -168,13 +173,10 @@ public class HangingTableServiceImpl implements HangingTableService {
                                                 String fieldValue = String.valueOf(jon.getString("fieldValue"));
                                                 mapdel.put("fieldName", fieldName);
                                                 mapdel.put("fieldValue", fieldValue);
-                                                hangingtableDelById(urlPrefix, mapdel, id, layercode);
+//                                                hangingtableDelById(urlPrefix, mapdel, id, layercode);
                                                 return id;
-                                            } else {
-                                                return jsoncode.getString("flag");
                                             }
                                         }
-                                        break;
                                     }
                                 }
                             }
@@ -186,6 +188,53 @@ public class HangingTableServiceImpl implements HangingTableService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * 区划id查询
+     * @param ids
+     */
+    public static String searchId(String ids) {
+        try{
+            String params = "ids="+ids+"&ak="+ak+"&include_geo=true";
+            String requestUrl = WrapRequest.wrapRequest("area", "getByIds", params, urlPrefix);
+            HttpClient client = HttpClientUtils.acceptsUntrustedCertsHttpClient();
+            //发送post请求
+            HttpPost request = new HttpPost(requestUrl);
+            HttpResponse response = client.execute(request);
+
+            /**请求发送成功，并得到响应**/
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                /**读取服务器返回过来的json字符串数据**/
+                String strResult = EntityUtils.toString(response.getEntity());
+                JSONObject jsoninfos = JSONObject.parseObject(strResult);
+                if("S001".equals(jsoninfos.getString("code"))) {
+                    JSONArray jsonResult = jsoninfos.getJSONArray("result");
+                    JSONObject json = jsonResult.getJSONObject(0);
+                    String points = "";
+                    JSONObject jon = json.getJSONObject("region");
+                    JSONArray jsonPoints = jon.getJSONArray("points");
+                    for(int j = 0; j < jsonPoints.size(); j++){
+                        JSONObject jsonPoint = jsonPoints.getJSONObject(j);
+                        Double x = Double.valueOf(jsonPoint.getString("x"));
+                        Double y = Double.valueOf(jsonPoint.getString("y"));
+                        Point point_ = SuperMapCoordinateConvertImpl
+                                .smMCToLatLon(new Point(x ,y));
+                        if(j < jsonPoints.size()-1) {
+                            points = points + "(" + point_.getLon() + "," + point_.getLat() + "),";
+                        }else{
+                            points = points + "(" + point_.getLon() + "," + point_.getLat() + ")";
+                        }
+                    }
+                    return points;
+                }else{
+                    System.err.println("删除待审核数据"+jsoninfos.getString("code"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  "";
     }
 
     /**
